@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/election")
+@RequestMapping("/v1/party")
 public class PartyApi {
 
 	private final PartyService partyService;
@@ -23,7 +23,7 @@ public class PartyApi {
 	}
 	
     @GetMapping("/")
-    @ApiOperation(value = "Get election List")
+    @ApiOperation(value = "Get party List")
     public List<PartyOutput> getAll(){
     	return partyService.getAll();
     }
