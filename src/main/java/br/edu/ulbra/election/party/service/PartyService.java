@@ -90,41 +90,33 @@ public class PartyService {
 		return new GenericOutput("Party deleted");
 	}
 
-
-	public Party findByName(String partyname){
-		return partyRepository.findByName(partyname);
-	}
-	public Party findByCode(String partycode){
-		return partyRepository.findByCode(partycode);
-	}
-	public Party findByNumber(Integer partynumber){
-		return partyRepository.findByNumber(partynumber);
-	}
-
 	private void validateInput(PartyInput partyInput, boolean isUpdate){
 		if (StringUtils.isBlank(partyInput.getName())){
 			throw new GenericOutputException("Invalid name");
 		}
+		
 		if (StringUtils.isBlank(partyInput.getCode())){
 			throw new GenericOutputException("Invalid Code");
 		}
+		
 		if (partyInput.getNumber() == null || partyInput.getNumber() == 0){
 			throw new GenericOutputException("Invalid Number");
 		}
-
-
-		if (this.findByCode(partyInput.getCode()) != null) {
-			throw new GenericOutputException("Codigo ja cadastrado!");
-		}
-		if (this.findByNumber(partyInput.getNumber()) != null) {
-			throw new GenericOutputException("Numero ja cadastrado!");
-		}
+		
+		if(partyInput.getName().length() < 5) {
+            throw new GenericOutputException("Name must be at least 5 characters");
+        }
 
 		if(Integer.toString(partyInput.getNumber()).length() != 2 ) {
-			throw new GenericOutputException("Numero teve ter 2 digitos");
+			throw new GenericOutputException("Number must be 2 characters");
 		}
-		if(partyInput.getName().length() < 5) {
-            throw new GenericOutputException("Nome teve ter no minimo 5 caracteres");
-        }
+		
+		if (partyRepository.findByCode(partyInput.getCode()) != null) {
+			throw new GenericOutputException("This code is already registered");
+		}
+		
+		if (partyRepository.findByNumber(partyInput.getNumber()) != null) {
+			throw new GenericOutputException("This number is already registered");
+		}
 	}
 }
