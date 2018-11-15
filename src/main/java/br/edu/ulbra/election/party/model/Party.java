@@ -1,52 +1,60 @@
 package br.edu.ulbra.election.party.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import br.edu.ulbra.election.party.output.v1.PartyOutput;
+import org.modelmapper.ModelMapper;
+
+import javax.persistence.*;
 
 @Entity
 public class Party {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-	
-	private String code;
-	
-	private String name;
-	
-	private Integer number;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(nullable = false, unique = true)
+    private String code;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(nullable = false)
+    private String name;
 
-	public String getCode() {
-		return code;
-	}
+    @Column(nullable = false, unique = true)
+    private Integer number;
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public Integer getNumber() {
-		return number;
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public static PartyOutput toPartyOutput(Party party) {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(party, PartyOutput.class);
+    }
 }
