@@ -1,11 +1,15 @@
 package br.edu.ulbra.election.party.service;
 
+import br.edu.ulbra.election.party.client.CandidateClientService;
 import br.edu.ulbra.election.party.exception.GenericOutputException;
 import br.edu.ulbra.election.party.input.v1.PartyInput;
 import br.edu.ulbra.election.party.model.Party;
+import br.edu.ulbra.election.party.output.v1.CandidateOutput;
 import br.edu.ulbra.election.party.output.v1.GenericOutput;
 import br.edu.ulbra.election.party.output.v1.PartyOutput;
 import br.edu.ulbra.election.party.repository.PartyRepository;
+import feign.FeignException;
+
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +25,16 @@ public class PartyService {
 
     private final ModelMapper modelMapper;
 
+    private final CandidateClientService candidateClientService;
+    
     private static final String MESSAGE_INVALID_ID = "Invalid id";
     private static final String MESSAGE_PARTY_NOT_FOUND = "Party not found";
-
+    private static final String MESSAGE_PARTY_WITH_CANDIDATE = "Party with candidates";
     @Autowired
-    public PartyService(PartyRepository partyRepository, ModelMapper modelMapper){
+    public PartyService(PartyRepository partyRepository, ModelMapper modelMapper, CandidateClientService candidateClientService){
         this.partyRepository = partyRepository;
         this.modelMapper = modelMapper;
+        this.candidateClientService = candidateClientService;
     }
 
     public List<PartyOutput> getAll(){
@@ -85,6 +92,18 @@ public class PartyService {
             throw new GenericOutputException(MESSAGE_PARTY_NOT_FOUND);
         }
 
+        try {
+            List<CandidateOutput> votes = candidateClientService.getByPartyId(partyId);
+            
+            if (votes.size() > 0) {
+            	throw new GenericOutputException(MESSAGE_PARTY_WITH_CANDIDATE);
+            }
+        } catch (FeignException e) {
+        	if (e.status() == 500) {
+                throw new GenericOutputException(MESSAGE_PARTY_NOT_FOUND);
+            }
+        }
+        
         partyRepository.delete(party);
 
         return new GenericOutput("Party deleted");
